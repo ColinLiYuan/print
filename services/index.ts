@@ -11,7 +11,7 @@ export const antiCounterfeitService = {
         API_ENDPOINTS.VERIFY_CODE,
         { code } as VerifyRequest
       );
-      return response.data;
+      return response.data.data;
     } catch (error) {
       console.error('Verification failed:', error);
       throw error;
@@ -27,7 +27,7 @@ export const productService = {
       const response = await apiClient.get<ApiResponse<Product[]>>(
         API_ENDPOINTS.PRODUCTS
       );
-      return response.data;
+      return response.data.data;
     } catch (error) {
       console.error('Failed to fetch products:', error);
       throw error;
@@ -40,7 +40,7 @@ export const productService = {
       const response = await apiClient.get<ApiResponse<Product>>(
         API_ENDPOINTS.PRODUCT_DETAIL(id)
       );
-      return response.data;
+      return response.data.data;
     } catch (error) {
       console.error('Failed to fetch product detail:', error);
       throw error;

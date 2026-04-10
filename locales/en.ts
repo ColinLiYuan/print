@@ -43,6 +43,13 @@ export default {
       features: ['Bespoke Design', 'Multi-layer Security', 'Brand Enhancement'],
     },
   },
+  products: {
+    title: 'Products',
+    subtitle: 'Comprehensive security solutions for global brand protection',
+    category: 'Category',
+    features: 'Features',
+    viewDetails: 'View Details',
+  },
   trustBarrier: {
     title: 'Multi-Level Security Architecture',
     subtitle: 'Three-tier authentication system providing comprehensive protection',

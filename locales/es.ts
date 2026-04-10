@@ -43,6 +43,13 @@ export default {
       features: ['Diseño Personalizado', 'Seguridad Multicapa', 'Mejora de Marca'],
     },
   },
+  products: {
+    title: 'Productos',
+    subtitle: 'Soluciones de seguridad integrales para la protección global de marcas',
+    category: 'Categoría',
+    features: 'Características',
+    viewDetails: 'Ver Detalles',
+  },
   trustBarrier: {
     title: 'Arquitectura de Seguridad Multinivel',
     subtitle: 'Sistema de autenticación de tres niveles que proporciona protección integral',

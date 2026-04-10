@@ -43,6 +43,13 @@ export default {
       features: ['定制设计', '多层安全', '品牌提升'],
     },
   },
+  products: {
+    title: '产品中心',
+    subtitle: '全球品牌保护的全面安全解决方案',
+    category: '类别',
+    features: '特性',
+    viewDetails: '查看详情',
+  },
   trustBarrier: {
     title: '多级安全架构',
     subtitle: '三层认证系统提供全面保护',
