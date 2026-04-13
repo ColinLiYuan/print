@@ -1,19 +1,5 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
 import "./globals.css";
-
-// 使用系统字体,避免网络请求
-const geistSans = localFont({
-  src: [],
-  variable: "--font-geist-sans",
-  display: "swap",
-});
-
-const geistMono = localFont({
-  src: [],
-  variable: "--font-geist-mono",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: {
@@ -98,9 +84,9 @@ export default function RootLayout({
   return (
     <html
       lang="zh"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className="h-full antialiased"
     >
-      <body className="min-h-full flex flex-col bg-white">
+      <body className="min-h-full flex flex-col bg-white font-sans">
         {children}
       </body>
     </html>
