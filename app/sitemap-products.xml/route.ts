@@ -3,11 +3,12 @@ import type { Product } from '@/types'
 
 export async function GET() {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
-    const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:9356'
+    const apiBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:9356'
     const locales = ['en', 'zh', 'es', 'ru']
 
     let products: Product[] = []
     try {
+        // 在 Server Component 中，需要直接调用后端 API，不能使用代理
         const productUrl = `${apiBaseUrl}/api/v1/products?page=0&size=100`
         const res = await fetch(productUrl, {
             method: 'GET',

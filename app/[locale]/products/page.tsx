@@ -21,6 +21,7 @@ export default function ProductsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
   const [pagination, setPagination] = useState({
     currentPage: 0,
     totalPages: 0,
@@ -157,120 +158,184 @@ export default function ProductsPage() {
         </div>
       </section>
 
-      {/* Category Filter */}
+      {/* Category Filter - 嵌套层级设计 */}
       <section className="py-8 bg-[#0A0A0A] border-y border-white/5">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex items-center space-x-4 overflow-x-auto pb-2 scrollbar-hide">
+          <div className="flex items-start gap-3 overflow-x-auto pb-2 scrollbar-hide">
+            {/* All Products */}
             <button
               onClick={() => setSelectedCategory('all')}
-              className={`px-6 py-2.5 rounded-lg whitespace-nowrap transition-all ${
+              className={`px-6 py-2.5 rounded-lg whitespace-nowrap transition-all flex-shrink-0 ${
                 selectedCategory === 'all'
-                  ? 'bg-gradient-to-r from-[#00F2FE] to-[#00C4CC] text-[#050505] font-semibold'
-                  : 'border border-white/10 text-gray-400 hover:border-[#00F2FE]/50 hover:text-[#E5E5E5]'
+                  ? 'bg-gradient-to-r from-[#00F2FE] to-[#00C4CC] text-[#050505] font-semibold shadow-lg shadow-[#00F2FE]/20'
+                  : 'border border-white/10 text-gray-400 hover:border-[#00F2FE]/50 hover:text-[#E5E5E5] hover:bg-white/5'
               }`}
             >
               All Products
             </button>
-            {categories.map((category) => (
-              <button
-                key={category.slug}
-                onClick={() => setSelectedCategory(category.slug)}
-                className={`px-6 py-2.5 rounded-lg whitespace-nowrap transition-all ${
-                  selectedCategory === category.slug
-                    ? 'bg-gradient-to-r from-[#00F2FE] to-[#00C4CC] text-[#050505] font-semibold'
-                    : 'border border-white/10 text-gray-400 hover:border-[#00F2FE]/50 hover:text-[#E5E5E5]'
-                }`}
-              >
-                {category.name}
-              </button>
-            ))}
+            
+            {/* Categories with subcategories */}
+            {categories.filter(cat => cat.slug !== 'best-sellers').map((category) => {
+              const isExpanded = expandedCategories.includes(category.slug);
+              const hasChildren = category.children && category.children.length > 0;
+              
+              return (
+                <div key={category.slug} className="flex-shrink-0">
+                  {/* Main Category */}
+                  <div className="relative">
+                    <button
+                      onClick={() => {
+                        if (hasChildren) {
+                          setExpandedCategories(prev =>
+                            prev.includes(category.slug)
+                              ? prev.filter(s => s !== category.slug)
+                              : [...prev, category.slug]
+                          );
+                        }
+                        setSelectedCategory(category.slug);
+                      }}
+                      className={`px-5 py-2.5 rounded-lg whitespace-nowrap transition-all flex items-center gap-2 ${
+                        selectedCategory === category.slug && !expandedCategories.includes(category.slug)
+                          ? 'bg-gradient-to-r from-[#00F2FE] to-[#00C4CC] text-[#050505] font-semibold shadow-lg shadow-[#00F2FE]/20'
+                          : 'border border-white/10 text-gray-400 hover:border-[#00F2FE]/50 hover:text-[#E5E5E5] hover:bg-white/5'
+                      }`}
+                    >
+                      {category.name}
+                      {hasChildren && (
+                        <span className={`text-xs transition-transform ${isExpanded ? 'rotate-180' : ''}`}>
+                          ▼
+                        </span>
+                      )}
+                    </button>
+                    
+                    {/* Subcategories Dropdown */}
+                    {hasChildren && isExpanded && (
+                      <div className="absolute top-full left-0 mt-2 bg-[#141414] border border-white/10 rounded-lg shadow-xl overflow-hidden z-50 min-w-[200px]">
+                        {category.children!.map((sub) => (
+                          <button
+                            key={sub.slug}
+                            onClick={() => {
+                              setSelectedCategory(sub.slug);
+                              setExpandedCategories([]);
+                            }}
+                            className={`w-full px-4 py-2.5 text-left text-sm transition-all ${
+                              selectedCategory === sub.slug
+                                ? 'bg-gradient-to-r from-[#00F2FE]/20 to-[#00C4CC]/20 text-[#00F2FE] font-medium'
+                                : 'text-gray-400 hover:bg-white/5 hover:text-[#E5E5E5]'
+                            }`}
+                          >
+                            {sub.name}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
 
       {/* Products Grid */}
-      <section className="py-24 bg-[#0A0A0A]">
+      <section className="py-20 bg-[#050505]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {products.map((product) => (
               <Link
                 key={product.id}
                 href={`/products/${product.slug}`}
-                className="group relative bg-gradient-to-br from-[#141414] to-[#0A0A0A] border border-white/10 rounded-xl overflow-hidden hover:border-[#00F2FE]/50 transition-all duration-300"
+                className="group relative bg-[#0A0A0A] border border-white/5 rounded-2xl overflow-hidden hover:border-[#00F2FE]/30 transition-all duration-500 hover:shadow-2xl hover:shadow-[#00F2FE]/10 hover:-translate-y-1"
               >
                 {/* Badge */}
                 {product.badge && (
-                  <div className="absolute top-3 left-3 z-10">
-                    <span className="px-2.5 py-1 rounded-md text-xs font-bold bg-gradient-to-r from-[#00F2FE] to-[#00C4CC] text-[#050505]">
+                  <div className="absolute top-4 left-4 z-10">
+                    <span className="px-3 py-1.5 rounded-full text-xs font-bold bg-gradient-to-r from-[#00F2FE] to-[#00C4CC] text-[#050505] shadow-lg shadow-[#00F2FE]/30">
                       {product.badge}
                     </span>
                   </div>
                 )}
 
                 {/* Product Image */}
-                <div className="relative aspect-square bg-gradient-to-br from-[#1a1a1a] to-[#0f0f0f] overflow-hidden">
+                <div className="relative aspect-[4/3] bg-[#141414] overflow-hidden">
                   <img
                     src={getImageUrl(product.image)}
                     alt={product.alt || product.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
                     onError={(e) => {
                       (e.target as HTMLImageElement).src = getPlaceholderUrl();
                     }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-transparent to-transparent opacity-0 group-hover:opacity-60 transition-opacity duration-300" />
+                  {/* Overlay gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A]/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-500" />
+                  
+                  {/* Quick view overlay */}
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500">
+                    <div className="bg-[#00F2FE]/90 backdrop-blur-sm text-[#050505] px-6 py-3 rounded-full font-semibold text-sm transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                      View Details →
+                    </div>
+                  </div>
                 </div>
 
                 {/* Product Info */}
-                <div className="p-5">
-                  {/* Brand */}
-                  <div className="mb-2">
-                    <span className="text-xs font-medium text-[#00F2FE] uppercase tracking-wider">
+                <div className="p-6 space-y-4">
+                  {/* Brand & Category */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-[#00F2FE] uppercase tracking-wider">
                       {product.brand}
                     </span>
+                    {product.categories && (
+                      <span className="text-xs text-gray-500">
+                        {Array.isArray(product.categories) ? product.categories[0].split('/').pop() : product.categories.split('/').pop()}
+                      </span>
+                    )}
                   </div>
 
                   {/* Title */}
-                  <h3 className="text-base font-semibold text-[#E5E5E5] mb-2 line-clamp-2 group-hover:text-[#00F2FE] transition-colors min-h-[48px]">
+                  <h3 className="text-lg font-bold text-[#E5E5E5] group-hover:text-[#00F2FE] transition-colors duration-300 line-clamp-2 min-h-[56px] leading-tight">
                     {product.title}
                   </h3>
 
                   {/* Description Preview */}
-                  <p className="text-gray-500 text-sm mb-4 line-clamp-2 min-h-[40px]">
-                    {product.description ? product.description.replace(/###|\*\*/g, '').substring(0, 100) + '...' : 'No description'}
+                  <p className="text-gray-500 text-sm leading-relaxed line-clamp-2 min-h-[40px]">
+                    {product.description ? product.description.replace(/###|\*\*/g, '').substring(0, 120) + '...' : 'Premium security product'}
                   </p>
 
                   {/* Features Tags */}
                   {product.features && product.features.length > 0 && (
-                    <div className="mb-4">
-                      <div className="flex flex-wrap gap-1.5">
-                        {product.features.slice(0, 2).map((feature, idx) => (
-                          <span
-                            key={idx}
-                            className="px-2 py-1 text-xs rounded bg-white/5 text-gray-400 border border-white/5"
-                          >
-                            {feature}
-                          </span>
-                        ))}
-                      </div>
+                    <div className="flex flex-wrap gap-2">
+                      {product.features.slice(0, 3).map((feature, idx) => (
+                        <span
+                          key={idx}
+                          className="px-2.5 py-1 text-xs rounded-full bg-[#00F2FE]/10 text-[#00F2FE] border border-[#00F2FE]/20 font-medium"
+                        >
+                          {feature}
+                        </span>
+                      ))}
                     </div>
                   )}
 
-                  {/* Price */}
-                  <div className="pt-4 border-t border-white/10">
-                    <div className="flex items-baseline gap-2">
+                  {/* Price Section */}
+                  <div className="pt-4 border-t border-white/5">
+                    <div className="flex items-baseline gap-3">
                       {product.originalPrice !== undefined && product.originalPrice !== null && product.originalPrice > product.currentPrice && (
-                        <span className="text-sm text-gray-500 line-through">
+                        <span className="text-base text-gray-600 line-through font-medium">
                           ${product.originalPrice.toFixed(2)}
                         </span>
                       )}
-                      <span className="text-xl font-bold text-[#00F2FE]">
+                      <span className="text-2xl font-bold bg-gradient-to-r from-[#00F2FE] to-[#00C4CC] bg-clip-text text-transparent">
                         ${product.currentPrice.toFixed(2)}
                       </span>
                     </div>
                     {product.minOrder !== undefined && product.minOrder !== null && product.minOrder > 1 && (
-                      <p className="text-xs text-gray-500 mt-1">
-                        Min. Order: {product.minOrder} pcs
-                      </p>
+                      <div className="flex items-center gap-2 mt-2">
+                        <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                        </svg>
+                        <p className="text-xs text-gray-500">
+                          MOQ: {product.minOrder} pcs
+                        </p>
+                      </div>
                     )}
                   </div>
                 </div>

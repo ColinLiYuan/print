@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { productAdminService, galleryAdminService } from '@/services';
-import type { Product, Gallery, ProductSku } from '@/types';
+import type { Product, Gallery, ProductSku, Category } from '@/types';
+import { categories } from '@/lib/categories';
 
 export default function EditProductPage() {
   const router = useRouter();
@@ -32,6 +33,11 @@ export default function EditProductPage() {
   // SKU列表
   const [skus, setSkus] = useState<ProductSku[]>([]);
 
+  // 分类选择状态
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string>('');
+  const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
+
   useEffect(() => {
     if (isEditing && productId !== 'new') {
       fetchProduct();
@@ -50,6 +56,20 @@ export default function EditProductPage() {
       // 获取SKU列表
       if (data.productSkus) {
         setSkus(data.productSkus);
+      }
+      // 恢复分类选择状态
+      if (data.categories) {
+        const categoriesStr = Array.isArray(data.categories) ? data.categories[0] : data.categories;
+        if (categoriesStr && typeof categoriesStr === 'string') {
+          const parts = categoriesStr.split('/');
+          if (parts.length === 2) {
+            setSelectedCategory(parts[0]);
+            setSelectedSubcategory(parts[1]);
+          } else if (parts.length === 1) {
+            setSelectedCategory(parts[0]);
+            setSelectedSubcategory('');
+          }
+        }
       }
     } catch (error) {
       console.error('Failed to fetch product:', error);
@@ -93,6 +113,7 @@ export default function EditProductPage() {
     try {
       const productData = { 
         ...product,
+        categories: selectedSubcategory ? `${selectedCategory}/${selectedSubcategory}` : selectedCategory,  // 保存分类路径
         productSkus: skus,  // 包含SKU数据
         galleries: galleries.map(g => ({
           id: g.id,
@@ -376,6 +397,87 @@ export default function EditProductPage() {
               <p className="text-xs text-gray-500 mt-1">用于 SEO 友好的 URL</p>
             </div>
           </div>
+        </div>
+
+        {/* 产品分类 */}
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">产品分类</h2>
+          <div className="space-y-4">
+            {categories.map((category) => (
+              <div key={category.slug} className="border border-gray-200 rounded-lg">
+                {/* 一级分类 */}
+                <div
+                  className="flex items-center justify-between p-3 cursor-pointer hover:bg-gray-50"
+                  onClick={() => {
+                    if (category.children && category.children.length > 0) {
+                      setExpandedCategories(prev =>
+                        prev.includes(category.slug)
+                          ? prev.filter(s => s !== category.slug)
+                          : [...prev, category.slug]
+                      );
+                    } else {
+                      setSelectedCategory(category.slug);
+                      setSelectedSubcategory('');
+                    }
+                  }}
+                >
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="radio"
+                      name="category"
+                      value={category.slug}
+                      checked={selectedCategory === category.slug && !selectedSubcategory}
+                      onChange={() => {
+                        setSelectedCategory(category.slug);
+                        setSelectedSubcategory('');
+                      }}
+                      className="w-4 h-4 text-[#00F2FE] focus:ring-[#00F2FE]"
+                    />
+                    <span className="font-medium text-gray-900">{category.name}</span>
+                  </div>
+                  {category.children && category.children.length > 0 && (
+                    <span className="text-gray-400">
+                      {expandedCategories.includes(category.slug) ? '▼' : '▶'}
+                    </span>
+                  )}
+                </div>
+
+                {/* 二级分类 */}
+                {category.children && category.children.length > 0 && expandedCategories.includes(category.slug) && (
+                  <div className="pl-8 pr-3 pb-3 space-y-2">
+                    {category.children.map((sub) => (
+                      <div
+                        key={sub.slug}
+                        className="flex items-center space-x-2 p-2 cursor-pointer hover:bg-gray-50 rounded"
+                        onClick={() => {
+                          setSelectedCategory(category.slug);
+                          setSelectedSubcategory(sub.slug);
+                        }}
+                      >
+                        <input
+                          type="radio"
+                          name="subcategory"
+                          value={sub.slug}
+                          checked={selectedSubcategory === sub.slug}
+                          onChange={() => {
+                            setSelectedCategory(category.slug);
+                            setSelectedSubcategory(sub.slug);
+                          }}
+                          className="w-4 h-4 text-[#00F2FE] focus:ring-[#00F2FE]"
+                        />
+                        <span className="text-gray-700">{sub.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+          {selectedCategory && (
+            <p className="text-xs text-gray-500 mt-2">
+              已选择: {selectedCategory}{selectedSubcategory ? ` / ${selectedSubcategory}` : ''}
+            </p>
+          )}
         </div>
 
         {/* SKU 管理 */}

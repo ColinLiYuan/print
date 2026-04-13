@@ -1,3 +1,12 @@
+// 产品分类类型 - 支持嵌套层级
+export interface Category {
+  name: string;
+  slug: string;
+  priority?: number;
+  changefreq?: string;
+  children?: Category[];  // 子分类
+}
+
 // 产品类型定义 - 根据后端实体 Product
 export interface Product {
   id: number;
