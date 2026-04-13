@@ -125,7 +125,7 @@ export interface BlogPost {
   title: string;
   slug: string;
   excerpt: string;
-  content: string;
+  content: string;  // Markdown 格式内容
   coverImage?: string;
   category: string;
   tags?: string[];  // 后端返回 JSON 数组字符串，前端解析为数组

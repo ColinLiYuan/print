@@ -2,6 +2,10 @@ import { blogService } from '@/services';
 import { BlogPost } from '@/types';
 import Link from 'next/link';
 import { formatImageUrl } from '@/lib/api-config';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeHighlight from 'rehype-highlight';
+import 'highlight.js/styles/github-dark.css';
 
 interface BlogDetailPageProps {
   params: Promise<{ locale: string; slug: string }>;
@@ -85,11 +89,6 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
                 })}
               </span>
             )}
-            {blog.viewCount !== undefined && (
-              <span className="text-[#6B7280] text-sm">
-                👁 {blog.viewCount} views
-              </span>
-            )}
           </div>
           
           {/* Title */}
@@ -133,10 +132,77 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
       {/* Content */}
       <section className="px-6 pb-20">
         <article className="max-w-4xl mx-auto bg-[#1a1a1a] rounded-xl p-8 md:p-12 border border-[#2a2a2a]">
-          <div
-            className="prose prose-invert prose-lg max-w-none"
-            dangerouslySetInnerHTML={{ __html: blog.content }}
-          />
+          <div className="prose prose-invert prose-lg max-w-none">
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              rehypePlugins={[rehypeHighlight]}
+              components={{
+                // 自定义样式
+                h1: ({ node, ...props }) => (
+                  <h1 className="text-3xl font-bold mb-6 mt-8 text-[#E5E5E5]" {...props} />
+                ),
+                h2: ({ node, ...props }) => (
+                  <h2 className="text-2xl font-bold mb-4 mt-8 text-[#E5E5E5] border-b border-[#2a2a2a] pb-2" {...props} />
+                ),
+                h3: ({ node, ...props }) => (
+                  <h3 className="text-xl font-semibold mb-3 mt-6 text-[#E5E5E5]" {...props} />
+                ),
+                p: ({ node, ...props }) => (
+                  <p className="mb-4 leading-relaxed text-[#9CA3AF]" {...props} />
+                ),
+                a: ({ node, ...props }) => (
+                  <a className="text-[#00D4FF] hover:text-[#00b8e6] underline" {...props} />
+                ),
+                ul: ({ node, ...props }) => (
+                  <ul className="list-disc list-inside mb-4 space-y-2 text-[#9CA3AF]" {...props} />
+                ),
+                ol: ({ node, ...props }) => (
+                  <ol className="list-decimal list-inside mb-4 space-y-2 text-[#9CA3AF]" {...props} />
+                ),
+                li: ({ node, ...props }) => (
+                  <li className="ml-4" {...props} />
+                ),
+                blockquote: ({ node, ...props }) => (
+                  <blockquote className="border-l-4 border-[#00D4FF] pl-4 italic my-4 text-[#9CA3AF]" {...props} />
+                ),
+                code: ({ node, inline, ...props }: any) => (
+                  inline ? (
+                    <code className="bg-[#2a2a2a] px-1.5 py-0.5 rounded text-sm text-[#00D4FF]" {...props} />
+                  ) : (
+                    <code className="block bg-[#0a0a0a] p-4 rounded-lg overflow-x-auto text-sm" {...props} />
+                  )
+                ),
+                img: ({ node, ...props }) => {
+                  // 处理图片路径：相对路径转换为完整 URL
+                  let src = props.src || '';
+                  if (src && typeof src === 'string' && !src.startsWith('http')) {
+                    // 相对路径，使用 formatImageUrl 处理
+                    src = formatImageUrl(src);
+                  }
+                  return (
+                    <img 
+                      {...props} 
+                      src={src}
+                      className="rounded-lg my-6 w-full" 
+                    />
+                  );
+                },
+                table: ({ node, ...props }) => (
+                  <div className="overflow-x-auto my-6">
+                    <table className="min-w-full divide-y divide-[#2a2a2a]" {...props} />
+                  </div>
+                ),
+                th: ({ node, ...props }) => (
+                  <th className="px-4 py-2 bg-[#2a2a2a] text-left text-sm font-semibold text-[#E5E5E5]" {...props} />
+                ),
+                td: ({ node, ...props }) => (
+                  <td className="px-4 py-2 border-t border-[#2a2a2a] text-sm text-[#9CA3AF]" {...props} />
+                ),
+              }}
+            >
+              {blog.content}
+            </ReactMarkdown>
+          </div>
         </article>
       </section>
       

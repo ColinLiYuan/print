@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { blogAdminService } from '@/services';
 import { BlogPost } from '@/types';
 import { formatImageUrl } from '@/lib/api-config';
+import MDEditor from '@uiw/react-md-editor';
 
 export default function EditBlogPage() {
   const router = useRouter();
@@ -295,16 +296,22 @@ export default function EditBlogPage() {
           <h2 className="text-lg font-semibold text-gray-900 mb-4">文章内容</h2>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              内容 *
+              内容 * (支持 Markdown 格式)
             </label>
-            <textarea
-              value={blog.content}
-              onChange={(e) => setBlog({ ...blog, content: e.target.value })}
-              rows={16}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-600 focus:border-transparent font-mono"
-              placeholder="在此输入文章内容（支持 Markdown 格式）"
-              required
-            />
+            <div data-color-mode="light">
+              <MDEditor
+                value={blog.content}
+                onChange={(value) => setBlog({ ...blog, content: value || '' })}
+                height={500}
+                preview="live"
+                textareaProps={{
+                  placeholder: '# 文章标题\n\n在此输入 Markdown 格式的内容...',
+                }}
+              />
+            </div>
+            <p className="mt-2 text-xs text-gray-500">
+              提示: 支持标准 Markdown 语法，包括表格、代码块、图片等
+            </p>
           </div>
         </div>
 
