@@ -45,10 +45,12 @@ export default {
   },
   products: {
     title: 'Productos',
-    subtitle: 'Soluciones de seguridad integrales para la protección global de marcas',
+    subtitle: 'Productos de calidad premium para mercados globales',
     category: 'Categoría',
     features: 'Características',
     viewDetails: 'Ver Detalles',
+    allProducts: 'Todos los Productos',
+    minOrder: 'Pedido Mínimo',
   },
   trustBarrier: {
     title: 'Arquitectura de Seguridad Multinivel',

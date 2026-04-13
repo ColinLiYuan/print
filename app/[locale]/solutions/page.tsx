@@ -1,12 +1,42 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
 
 interface SolutionsPageProps {
   params: Promise<{ locale: string }>;
 }
 
+export async function generateMetadata({ params }: SolutionsPageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const isEn = locale === 'en';
+  
+  return {
+    title: isEn 
+      ? 'Industry Security Solutions - HoloVerify Global'
+      : '行业安全解决方案 - HoloVerify Global',
+    description: isEn
+      ? 'Tailored security solutions for pharmaceuticals, beauty, liquor, and government documents. Advanced anti-counterfeiting technology for every industry.'
+      : '为医药、美容、酒类和政府文件量身定制的安全解决方案。适用于各行业的高级防伪技术。',
+    keywords: isEn
+      ? ['pharmaceutical security', 'beauty anti-counterfeit', 'liquor protection', 'document security', 'industry solutions']
+      : ['医药安全', '美容防伪', '酒类保护', '证件安全', '行业解决方案'],
+    openGraph: {
+      title: isEn ? 'Industry-Specific Security Solutions' : '行业专属安全解决方案',
+      description: isEn
+        ? 'Customized security protocols for critical sectors worldwide'
+        : '为全球关键行业量身定制的安全协议',
+      type: 'website',
+    },
+    alternates: {
+      canonical: `https://holoverify.com/${locale}/solutions`,
+    },
+  };
+}
+
 export default async function SolutionsPage({ params }: SolutionsPageProps) {
   const { locale } = await params;
-  const currentLocale = locale === 'en' ? 'en' : 'zh';
+  // 确保 locale 是有效的语言代码
+  const validLocales = ['zh', 'en', 'es', 'ru'] as const;
+  const currentLocale = validLocales.includes(locale as any) ? (locale as typeof validLocales[number]) : 'en';
   const messages = await import(`@/locales/${currentLocale}`).then(mod => mod.default);
 
   const solutions = [

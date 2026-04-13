@@ -12,7 +12,9 @@ export function middleware(request: NextRequest) {
 
   // 如果缺少语言前缀,重定向到默认语言
   if (pathnameIsMissingLocale) {
-    const locale = defaultLocale;
+    // 优先从 cookie 读取用户选择的语言
+    const localeCookie = request.cookies.get('NEXT_LOCALE')?.value;
+    const locale = locales.includes(localeCookie as any) ? localeCookie : defaultLocale;
     return NextResponse.redirect(new URL(`/${locale}${pathname}`, request.url));
   }
 
@@ -21,7 +23,7 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // 排除 API 路由、静态文件等
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    // 排除 API 路由、静态文件、图片代理、favicon、sitemap、管理后台、robots
+    '/((?!api|images|_next/static|_next/image|favicon.ico|placeholder-product\\.svg|sitemap|robots|admin).*)',
   ],
 };

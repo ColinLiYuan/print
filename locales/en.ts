@@ -45,10 +45,12 @@ export default {
   },
   products: {
     title: 'Products',
-    subtitle: 'Comprehensive security solutions for global brand protection',
+    subtitle: 'Premium quality products for global markets',
     category: 'Category',
     features: 'Features',
     viewDetails: 'View Details',
+    allProducts: 'All Products',
+    minOrder: 'Min. Order',
   },
   trustBarrier: {
     title: 'Multi-Level Security Architecture',

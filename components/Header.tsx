@@ -19,7 +19,8 @@ export default function Header({ locale, translations }: HeaderProps) {
     { href: '/', label: translations.common.home },
     { href: '/solutions', label: translations.common.solutions },
     { href: '/verify', label: translations.common.verify },
-    { href: '/industries', label: translations.common.industries },
+    { href: '/products', label: translations.products.title },
+    { href: `/${locale}/blog`, label: 'Blog' },
     { href: '/contact', label: translations.common.contact },
   ];
 
@@ -88,6 +89,19 @@ export default function Header({ locale, translations }: HeaderProps) {
 
               {isLangOpen && (
                 <div className="absolute right-0 mt-2 w-40 bg-[#0A0A0A] border border-white/10 rounded-lg shadow-2xl py-2 backdrop-blur-xl">
+                  <button
+                    onClick={() => {
+                      switchLocale('zh');
+                      setIsLangOpen(false);
+                    }}
+                    className={`block w-full text-left px-4 py-2 text-sm transition-colors ${
+                      locale === 'zh'
+                        ? 'text-[#00F2FE] bg-white/5'
+                        : 'text-gray-400 hover:text-[#E5E5E5] hover:bg-white/5'
+                    }`}
+                  >
+                    中文 (ZH)
+                  </button>
                   <button
                     onClick={() => {
                       switchLocale('en');

@@ -7,7 +7,10 @@ import { useParams } from 'next/navigation';
 export default function ContactPage() {
   const params = useParams();
   const locale = (params?.locale as string) || 'zh';
-  const translations = getTranslation(locale === 'en' ? 'en' : 'zh');
+  // 确保 locale 是有效的语言代码
+  const validLocales = ['zh', 'en', 'es', 'ru'] as const;
+  const currentLocale = validLocales.includes(locale as any) ? (locale as typeof validLocales[number]) : 'en';
+  const translations = getTranslation(currentLocale);
   const [formData, setFormData] = useState({
     name: '',
     email: '',

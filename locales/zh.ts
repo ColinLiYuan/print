@@ -45,10 +45,12 @@ export default {
   },
   products: {
     title: '产品中心',
-    subtitle: '全球品牌保护的全面安全解决方案',
+    subtitle: '面向全球市场的优质产品',
     category: '类别',
     features: '特性',
     viewDetails: '查看详情',
+    allProducts: '全部产品',
+    minOrder: '最小起订量',
   },
   trustBarrier: {
     title: '多级安全架构',

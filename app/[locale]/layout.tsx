@@ -9,7 +9,9 @@ interface LocaleLayoutProps {
 
 export default async function LocaleLayout({ children, params }: LocaleLayoutProps) {
   const { locale } = await params;
-  const currentLocale = locale === 'en' ? 'en' : 'zh';
+  // 确保 locale 是有效的语言代码
+  const validLocales = ['zh', 'en', 'es', 'ru'] as const;
+  const currentLocale = validLocales.includes(locale as any) ? (locale as typeof validLocales[number]) : 'en';
   const translations = getTranslation(currentLocale);
 
   return (

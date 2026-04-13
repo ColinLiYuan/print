@@ -1,12 +1,42 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
 
 interface SampleKitPageProps {
   params: Promise<{ locale: string }>;
 }
 
+export async function generateMetadata({ params }: SampleKitPageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const isEn = locale === 'en';
+  
+  return {
+    title: isEn 
+      ? 'Free Security Sample Kit - HoloVerify Global'
+      : '免费安全样品套装 - HoloVerify Global',
+    description: isEn
+      ? 'Request your free sample kit containing 15+ physical samples of holographic foils, tamper evident labels, and digital security solutions. Experience our technology firsthand.'
+      : '申请您的免费样品套装，包含15+种全息箔、防篡改标签和数字安全解决方案的实物样品。亲身体验我们的技术。',
+    keywords: isEn
+      ? ['sample kit', 'free samples', 'hologram samples', 'security testing', 'product demonstration']
+      : ['样品套装', '免费样品', '全息样品', '安全测试', '产品展示'],
+    openGraph: {
+      title: isEn ? 'Free Security Sample Kit' : '免费安全样品套装',
+      description: isEn
+        ? 'Experience premium security solutions with our comprehensive sample kit'
+        : '通过我们全面的样品套装体验高级安全解决方案',
+      type: 'website',
+    },
+    alternates: {
+      canonical: `https://holoverify.com/${locale}/sample-kit`,
+    },
+  };
+}
+
 export default async function SampleKitPage({ params }: SampleKitPageProps) {
   const { locale } = await params;
-  const currentLocale = locale === 'en' ? 'en' : 'zh';
+  // 确保 locale 是有效的语言代码
+  const validLocales = ['zh', 'en', 'es', 'ru'] as const;
+  const currentLocale = validLocales.includes(locale as any) ? (locale as typeof validLocales[number]) : 'en';
   const messages = await import(`@/locales/${currentLocale}`).then(mod => mod.default);
 
   const kitContents = [

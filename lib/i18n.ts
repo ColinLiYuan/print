@@ -5,7 +5,7 @@ import ru from '../locales/ru';
 
 export type Locale = 'zh' | 'en' | 'es' | 'ru';
 
-export const locales: Locale[] = ['en', 'es', 'ru'];
+export const locales: Locale[] = ['zh', 'en', 'es', 'ru'];
 
 export const defaultLocale: Locale = 'en';
 
